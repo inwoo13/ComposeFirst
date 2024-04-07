@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -93,14 +94,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// Drawer
+// Dialog
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyDrawer()
+                MyDialog()
             }
         }
     }
@@ -108,110 +109,69 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyDrawer() {
+fun MyDialog(){
 
-    val drawableState = rememberDrawerState(initialValue = DrawerValue.Closed)  // 기본은 닫혀있는 상태
-    val scope = rememberCoroutineScope()
-
-    val screens = listOf(
-        Screen.Home,
-        Screen.Settings,
-        Screen.Phone,
-        Screen.Search,
-        Screen.Lock
-    )
-
-    val selectedScreen: MutableState<Screen> = remember {
-        mutableStateOf(Screen.Home)
+    var dialogFlag by remember {
+        mutableStateOf(false)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "MyDrawer") },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch { drawableState.open() }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu"
-                        )
-                    }
-                })
+    var inputText by remember {
+        mutableStateOf("")
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = { dialogFlag = true }) {
+            Text(text = "나와라 Dialog")
         }
-    ) { paddingValues ->
 
-        ModalNavigationDrawer(
-            drawerState = drawableState,
-            modifier = Modifier.padding(paddingValues),
-            drawerContent = {
-                ModalDrawerSheet {
-                    screens.forEach { screen ->
-                        NavigationDrawerItem(
-                            icon = { Icon(screen.icon, contentDescription = screen.icon.name) },
-                            label = { Text(text = screen.name) },
-                            selected = screen == selectedScreen.value,
-                            onClick = {
-                                scope.launch { drawableState.close() }
-                                selectedScreen.value = screen
-                            }
+        if(dialogFlag) {
+            AlertDialog(
+                onDismissRequest = { },
+                title = { Text(text = "Dialog Title")},
+                text = {
+                    TextField(
+                        value = inputText,
+                        onValueChange = {inputText = it}
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { dialogFlag = false },
+                        colors = ButtonDefaults.buttonColors (
+                            containerColor = Color.Blue
                         )
+                    ) {
+                        Text(text = "OK")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { dialogFlag = false },
+                        colors = ButtonDefaults.buttonColors (
+                            containerColor = Color.Red
+                        )
+                    ) {
+                        Text(text = "NO")
                     }
                 }
-            },
-            content = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    when (selectedScreen.value) {
-                        Screen.Home -> HomeScreen()
-                        Screen.Lock -> LockScreen()
-                        Screen.Phone -> PhoneScreen()
-                        Screen.Search -> SearchScreen()
-                        Screen.Settings -> SettingsScreen()
-                    }
-                }
-            }
-        )
+
+            )
+        }
+
+        if(inputText.isNotEmpty()) {
+            Text(
+                text = "입력된 텍스트 : $inputText",
+                fontSize = 40.sp,
+                lineHeight = 40.sp
+            )
+        }
+
+
     }
-
-}
-
-@Composable
-fun HomeScreen() {
-    Text(text = "HomeScreen")
-}
-
-@Composable
-fun SettingsScreen() {
-    Text(text = "SettingsScreen")
-}
-
-@Composable
-fun PhoneScreen() {
-    Text(text = "PhoneScreen")
-}
-
-@Composable
-fun SearchScreen() {
-    Text(text = "SearchScreen")
-}
-
-@Composable
-fun LockScreen() {
-    Text(text = "LockScreen")
-}
-
-sealed class Screen(val name: String, val icon: ImageVector) {
-    object Home : Screen("Home", Icons.Default.Home)
-    object Settings : Screen("Settings", Icons.Default.Settings)
-    object Phone : Screen("Phone", Icons.Default.Phone)
-    object Search : Screen("Search", Icons.Default.Search)
-    object Lock : Screen("Lock", Icons.Default.Lock)
 
 }
 
@@ -219,6 +179,6 @@ sealed class Screen(val name: String, val icon: ImageVector) {
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyDrawer()
+        MyDialog()
     }
 }
