@@ -30,7 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -38,11 +41,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -50,7 +57,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,103 +93,132 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// Retrofit
+// Drawer
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                InsertInputData()
+                MyDrawer()
             }
         }
     }
+}
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun InsertInputData() {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyDrawer() {
 
-        var inputNumber by remember {
-            mutableStateOf("")
+    val drawableState = rememberDrawerState(initialValue = DrawerValue.Closed)  // 기본은 닫혀있는 상태
+    val scope = rememberCoroutineScope()
+
+    val screens = listOf(
+        Screen.Home,
+        Screen.Settings,
+        Screen.Phone,
+        Screen.Search,
+        Screen.Lock
+    )
+
+    val selectedScreen: MutableState<Screen> = remember {
+        mutableStateOf(Screen.Home)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "MyDrawer") },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch { drawableState.open() }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu"
+                        )
+                    }
+                })
         }
+    ) { paddingValues ->
 
-        var post by remember {
-            mutableStateOf<Post?>(null)
-        }
-
-        val coroutineScope = rememberCoroutineScope()
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TextField(
-                value = inputNumber,
-                onValueChange = { inputNumber = it },
-                label = { Text(text = "숫자를 입력해주세요") }
-            )
-            Button(onClick = {
-                val number = inputNumber.toIntOrNull()
-                if(number != null) {
-                    coroutineScope.launch {
-                        post = getPostData(number)
+        ModalNavigationDrawer(
+            drawerState = drawableState,
+            modifier = Modifier.padding(paddingValues),
+            drawerContent = {
+                ModalDrawerSheet {
+                    screens.forEach { screen ->
+                        NavigationDrawerItem(
+                            icon = { Icon(screen.icon, contentDescription = screen.icon.name) },
+                            label = { Text(text = screen.name) },
+                            selected = screen == selectedScreen.value,
+                            onClick = {
+                                scope.launch { drawableState.close() }
+                                selectedScreen.value = screen
+                            }
+                        )
                     }
                 }
-            }) {
-                Text(text = "데이터 받아오기")
+            },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    when (selectedScreen.value) {
+                        Screen.Home -> HomeScreen()
+                        Screen.Lock -> LockScreen()
+                        Screen.Phone -> PhoneScreen()
+                        Screen.Search -> SearchScreen()
+                        Screen.Settings -> SettingsScreen()
+                    }
+                }
             }
-            post?.let{
-                Text(text = "UserId : " + it.userId)
-                Text(text = "Id : " + it.id)
-                Text(text = "Title : " + it.title)
-                Text(text = "Body : " + it.body)
-            }
-        }
-
+        )
     }
 
 }
 
-private suspend fun getPostData(number : Int) : Post? {
+@Composable
+fun HomeScreen() {
+    Text(text = "HomeScreen")
+}
 
-    val retrofitInstance = RetrofitInstance.getInstance().create(MyApi::class.java)
-    val response = retrofitInstance.getPostNumber(number)
-    return if (response.isSuccessful) response.body() else null
+@Composable
+fun SettingsScreen() {
+    Text(text = "SettingsScreen")
+}
+
+@Composable
+fun PhoneScreen() {
+    Text(text = "PhoneScreen")
+}
+
+@Composable
+fun SearchScreen() {
+    Text(text = "SearchScreen")
+}
+
+@Composable
+fun LockScreen() {
+    Text(text = "LockScreen")
+}
+
+sealed class Screen(val name: String, val icon: ImageVector) {
+    object Home : Screen("Home", Icons.Default.Home)
+    object Settings : Screen("Settings", Icons.Default.Settings)
+    object Phone : Screen("Phone", Icons.Default.Phone)
+    object Search : Screen("Search", Icons.Default.Search)
+    object Lock : Screen("Lock", Icons.Default.Lock)
 
 }
 
-data class Post(
-    val userId: Int,
-    val id: Int,
-    val title: String,
-    val body: String
-)
-
-object RetrofitInstance {
-
-    val BASE_URL = "https://jsonplaceholder.typicode.com/"
-
-    val client = Retrofit
-        .Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    fun getInstance(): Retrofit {
-        return client
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    ComposeFirstTheme {
+        MyDrawer()
     }
-
-}
-
-interface MyApi {
-
-    @GET("posts/1")
-    suspend fun getPost1(): Response<Post>
-
-    @GET("posts/{number}")
-    suspend fun getPostNumber(
-        @Path("number") number: Int
-    ): Response<Post>
-
 }
