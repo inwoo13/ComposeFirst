@@ -54,6 +54,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
@@ -63,87 +64,104 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// Show / Hide
+// Navigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyShowHideEx2()
+                MyNav()
             }
         }
     }
 }
 
-// 버튼을 클릭하면 새로운 버튼이 나오는 것
 @Composable
-fun MyShowHideEx1() {
-
-    var isButtonVisible by remember {
-        mutableStateOf(false)
-    }
+fun MyScreen1(navController: NavController){
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(onClick = {
-            isButtonVisible = !isButtonVisible
-            println(isButtonVisible)
-        }) {
-            if (isButtonVisible) {
-                Text(
-                    text = "숨기기",
-                    fontSize = 50.sp
-                )
-            } else {
-                Text(
-                    text = "보이기",
-                    fontSize = 50.sp
-                )
-            }
+        Text(
+            text = "화면1",
+            fontSize = 50.sp
+        )
+        Button(onClick = { navController.navigate("MyScreen2") }) {
+            Text(
+                text = "2번 화면으로 가기",
+                fontSize = 30.sp
+            )
         }
-
-        if (isButtonVisible) {
-            Button(onClick = {
-            }) {
-                Text(
-                    text = "짠짠짠",
-                    fontSize = 50.sp
-                )
-            }
-        }
-
     }
 }
 
 @Composable
-fun MyShowHideEx2() {
-
-    var switchState by remember {
-        mutableStateOf(false)
-    }
+fun MyScreen2(navController: NavController){
 
     Column(
-        modifier = Modifier.padding(20.dp)
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Switch(
-            checked = switchState,
-            onCheckedChange = { checked ->
-                switchState = checked
-            }
-        )
-
         Text(
-            text = if (switchState) "ON" else "OFF",
-            fontSize = 100.sp
+            text = "화면2",
+            fontSize = 50.sp
         )
+        Button(onClick = { navController.navigate("MyScreen3") }) {
+            Text(
+                text = "3번 화면으로 가기",
+                fontSize = 30.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun MyScreen3(navController: NavController){
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "화면3",
+            fontSize = 50.sp
+        )
+        Button(onClick = { navController.navigate("MyScreen1") }) {
+            Text(
+                text = "1번 화면으로 가기",
+                fontSize = 30.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun MyNav(){
+
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "MyScreen1"){
+        composable("MyScreen1"){
+            MyScreen1(navController = navController)
+        }
+        composable("MyScreen2"){
+            MyScreen2(navController = navController)
+        }
+        composable("MyScreen3"){
+            MyScreen3(navController = navController)
+        }
     }
 
 }
@@ -152,6 +170,6 @@ fun MyShowHideEx2() {
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyShowHideEx2()
+        MyNav()
     }
 }
