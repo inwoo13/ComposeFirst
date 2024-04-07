@@ -42,6 +42,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -65,72 +66,92 @@ import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// 코드 재활용하는법
+// Show / Hide
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyTextArea3()
+                MyShowHideEx2()
             }
         }
     }
 }
 
+// 버튼을 클릭하면 새로운 버튼이 나오는 것
 @Composable
-fun MyTextArea1() {
+fun MyShowHideEx1() {
 
-    MyTextArea2()
+    var isButtonVisible by remember {
+        mutableStateOf(false)
+    }
 
-}
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(onClick = {
+            isButtonVisible = !isButtonVisible
+            println(isButtonVisible)
+        }) {
+            if (isButtonVisible) {
+                Text(
+                    text = "숨기기",
+                    fontSize = 50.sp
+                )
+            } else {
+                Text(
+                    text = "보이기",
+                    fontSize = 50.sp
+                )
+            }
+        }
 
-@Composable
-fun MyTextArea2() {
-    Column() {
-        MyTextFormat1("안녕", 100.sp, Color.Red)
-        MyTextFormat1("나는", 100.sp, Color.Green)
-        MyTextFormat1("누구야", 100.sp, Color.Gray)
+        if (isButtonVisible) {
+            Button(onClick = {
+            }) {
+                Text(
+                    text = "짠짠짠",
+                    fontSize = 50.sp
+                )
+            }
+        }
+
     }
 }
 
 @Composable
-fun MyTextFormat1(text: String, fontSize: TextUnit, color: Color) {
-    Text(
-        text = text,
-        fontSize = fontSize,
-        color = color
-    )
-}
+fun MyShowHideEx2() {
 
-@Composable
-fun MyTextArea3() {
-    MyTextFormat2 {
+    var switchState by remember {
+        mutableStateOf(false)
+    }
+
+    Column(
+        modifier = Modifier.padding(20.dp)
+    ) {
+
+        Switch(
+            checked = switchState,
+            onCheckedChange = { checked ->
+                switchState = checked
+            }
+        )
+
         Text(
-            text = "안녕",
-            fontSize = 100.sp,
-            color = Color.Red
+            text = if (switchState) "ON" else "OFF",
+            fontSize = 100.sp
         )
     }
-}
 
-@Composable
-fun MyTextFormat2(content: @Composable () -> Unit) {
-    Column(){
-        content()
-        content()
-        content()
-        content()
-        content()
-        content()
-    }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyTextArea3()
+        MyShowHideEx2()
     }
 }
