@@ -1,6 +1,7 @@
 package com.inflean.composefirst
 
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -52,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,83 +75,69 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
+import kotlinx.coroutines.launch
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
 
-// Navigation
+// Retrofit
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyNav(rememberNavController())
-            }
-        }
-    }
-}
 
-@Composable
-fun MyGridScreen(navHostController: NavHostController) {
+                val coroutineScope = rememberCoroutineScope()
+                val retrofitInstance = RetrofitInstance.getInstance().create(MyApi::class.java)
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier.padding(20.dp)
-    ) {
-
-        items(15) { number ->
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.Black)
-                    .clickable {
-                        navHostController.navigate("myNumberScreen/$number")
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    Button(onClick = {
+                        coroutineScope.launch {
+                            val response = retrofitInstance.getPost1()
+                            Log.d("MainActivity", response.body().toString())
+                        }
+                    }) {
+                        Text(
+                            text = "CALL API"
+                        )
                     }
-            ) {
-                Text(
-                    text = number.toString(),
-                    fontSize = 30.sp
-                )
+                }
             }
         }
+    }
+}
 
+data class Post(
+    val userId : Int,
+    val id : Int,
+    val title : String,
+    val body : String
+)
+
+object RetrofitInstance {
+
+    val BASE_URL = "https://jsonplaceholder.typicode.com/"
+
+    val client = Retrofit
+        .Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    fun getInstance() : Retrofit {
+        return client
     }
 
 }
 
-@Composable
-fun MyNumberScreen(number: String?) {
+interface MyApi {
 
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(
-            text = number.toString(),
-            fontSize = 70.sp
-        )
-    }
+    @GET("posts/1")
+    suspend fun getPost1() : Response<Post>
 
-}
-
-@Composable
-fun MyNav(navHostController: NavHostController) {
-
-    NavHost(navController = navHostController, startDestination = "myGridScreen") {
-        composable("myGridScreen") {
-            MyGridScreen(navHostController)
-        }
-        composable("myNumberScreen/{number}") { navBackStackEntry ->
-            MyNumberScreen(number = navBackStackEntry.arguments?.getString("number"))
-        }
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComposeFirstTheme {
-        MyNav(rememberNavController())
-    }
 }
