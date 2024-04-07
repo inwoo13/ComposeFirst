@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -65,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -78,89 +81,66 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyNav()
+                MyNav(rememberNavController())
             }
         }
     }
 }
 
 @Composable
-fun MyScreen1(navController: NavController){
+fun MyGridScreen(navHostController: NavHostController) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = Modifier.padding(20.dp)
     ) {
-        Text(
-            text = "화면1",
-            fontSize = 50.sp
-        )
-        Button(onClick = { navController.navigate("MyScreen2") }) {
-            Text(
-                text = "2번 화면으로 가기",
-                fontSize = 30.sp
-            )
+
+        items(15) { number ->
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .border(1.dp, Color.Black)
+                    .clickable {
+                        navHostController.navigate("myNumberScreen/$number")
+                    }
+            ) {
+                Text(
+                    text = number.toString(),
+                    fontSize = 30.sp
+                )
+            }
         }
+
     }
+
 }
 
 @Composable
-fun MyScreen2(navController: NavController){
+fun MyNumberScreen(number: String?) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = "화면2",
-            fontSize = 50.sp
+            text = number.toString(),
+            fontSize = 70.sp
         )
-        Button(onClick = { navController.navigate("MyScreen3") }) {
-            Text(
-                text = "3번 화면으로 가기",
-                fontSize = 30.sp
-            )
-        }
     }
+
 }
 
 @Composable
-fun MyScreen3(navController: NavController){
+fun MyNav(navHostController: NavHostController) {
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "화면3",
-            fontSize = 50.sp
-        )
-        Button(onClick = { navController.navigate("MyScreen1") }) {
-            Text(
-                text = "1번 화면으로 가기",
-                fontSize = 30.sp
-            )
+    NavHost(navController = navHostController, startDestination = "myGridScreen") {
+        composable("myGridScreen") {
+            MyGridScreen(navHostController)
         }
-    }
-}
-
-@Composable
-fun MyNav(){
-
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = "MyScreen1"){
-        composable("MyScreen1"){
-            MyScreen1(navController = navController)
-        }
-        composable("MyScreen2"){
-            MyScreen2(navController = navController)
-        }
-        composable("MyScreen3"){
-            MyScreen3(navController = navController)
+        composable("myNumberScreen/{number}") { navBackStackEntry ->
+            MyNumberScreen(number = navBackStackEntry.arguments?.getString("number"))
         }
     }
 
@@ -170,6 +150,6 @@ fun MyNav(){
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyNav()
+        MyNav(rememberNavController())
     }
 }
