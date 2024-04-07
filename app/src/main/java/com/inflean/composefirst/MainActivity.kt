@@ -47,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -80,6 +81,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 // Retrofit
 
@@ -88,35 +90,70 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-
-                val coroutineScope = rememberCoroutineScope()
-                val retrofitInstance = RetrofitInstance.getInstance().create(MyApi::class.java)
-
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ){
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            val response = retrofitInstance.getPost1()
-                            Log.d("MainActivity", response.body().toString())
-                        }
-                    }) {
-                        Text(
-                            text = "CALL API"
-                        )
-                    }
-                }
+                InsertInputData()
             }
         }
     }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun InsertInputData() {
+
+        var inputNumber by remember {
+            mutableStateOf("")
+        }
+
+        var post by remember {
+            mutableStateOf<Post?>(null)
+        }
+
+        val coroutineScope = rememberCoroutineScope()
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TextField(
+                value = inputNumber,
+                onValueChange = { inputNumber = it },
+                label = { Text(text = "숫자를 입력해주세요") }
+            )
+            Button(onClick = {
+                val number = inputNumber.toIntOrNull()
+                if(number != null) {
+                    coroutineScope.launch {
+                        post = getPostData(number)
+                    }
+                }
+            }) {
+                Text(text = "데이터 받아오기")
+            }
+            post?.let{
+                Text(text = "UserId : " + it.userId)
+                Text(text = "Id : " + it.id)
+                Text(text = "Title : " + it.title)
+                Text(text = "Body : " + it.body)
+            }
+        }
+
+    }
+
+}
+
+private suspend fun getPostData(number : Int) : Post? {
+
+    val retrofitInstance = RetrofitInstance.getInstance().create(MyApi::class.java)
+    val response = retrofitInstance.getPostNumber(number)
+    return if (response.isSuccessful) response.body() else null
+
 }
 
 data class Post(
-    val userId : Int,
-    val id : Int,
-    val title : String,
-    val body : String
+    val userId: Int,
+    val id: Int,
+    val title: String,
+    val body: String
 )
 
 object RetrofitInstance {
@@ -129,7 +166,7 @@ object RetrofitInstance {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    fun getInstance() : Retrofit {
+    fun getInstance(): Retrofit {
         return client
     }
 
@@ -138,6 +175,11 @@ object RetrofitInstance {
 interface MyApi {
 
     @GET("posts/1")
-    suspend fun getPost1() : Response<Post>
+    suspend fun getPost1(): Response<Post>
+
+    @GET("posts/{number}")
+    suspend fun getPostNumber(
+        @Path("number") number: Int
+    ): Response<Post>
 
 }
