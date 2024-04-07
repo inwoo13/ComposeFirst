@@ -58,67 +58,72 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// ProgressIndicator
+// 코드 재활용하는법
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyProgressIndicator()
+                MyTextArea3()
             }
         }
     }
 }
 
 @Composable
-fun MyProgressIndicator() {
+fun MyTextArea1() {
 
-    var progress by remember { mutableStateOf(0.0f) }
+    MyTextArea2()
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+}
 
-        Button(onClick = {
-            if (progress <= 1f) {
-                progress += 0.1f
-            } else {
-                progress = 0.0f
-            }
-        }) {
-            Text(
-                text = "행복게이지",
-                fontSize = 30.sp
-            )
-        }
+@Composable
+fun MyTextArea2() {
+    Column() {
+        MyTextFormat1("안녕", 100.sp, Color.Red)
+        MyTextFormat1("나는", 100.sp, Color.Green)
+        MyTextFormat1("누구야", 100.sp, Color.Gray)
+    }
+}
 
-        Spacer(modifier = Modifier.size(30.dp))
+@Composable
+fun MyTextFormat1(text: String, fontSize: TextUnit, color: Color) {
+    Text(
+        text = text,
+        fontSize = fontSize,
+        color = color
+    )
+}
 
-        LinearProgressIndicator(
-            progress = progress,
-            modifier = Modifier.height(20.dp),
-            color = Color.Red,  // 차는 색
-            trackColor = Color.Cyan // 기본 색
-        )
-
-        Spacer(modifier = Modifier.size(30.dp))
-
-        CircularProgressIndicator(
-            progress = progress,
+@Composable
+fun MyTextArea3() {
+    MyTextFormat2 {
+        Text(
+            text = "안녕",
+            fontSize = 100.sp,
             color = Color.Red
         )
-
     }
+}
 
+@Composable
+fun MyTextFormat2(content: @Composable () -> Unit) {
+    Column(){
+        content()
+        content()
+        content()
+        content()
+        content()
+        content()
+    }
 }
 
 
@@ -126,6 +131,6 @@ fun MyProgressIndicator() {
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyProgressIndicator()
+        MyTextArea3()
     }
 }
