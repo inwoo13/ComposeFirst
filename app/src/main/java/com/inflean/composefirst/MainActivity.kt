@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -54,105 +58,72 @@ import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// Scaffold
+// LaxyColumn / LazyRow
+// scrollview 같은 놈임
+// Item Click
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyScaffoldEx()
+                MyLazyRow()
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScaffoldEx(){
+fun MyLazyColumnEx() {
 
-    Scaffold(
-        topBar = {
-            MyTopBar()
-        },
-        floatingActionButton = {
-            MyFloatingActionButton()
-        },
-        bottomBar = {
-            MyBototmBar()
-        }
-    ) {paddingValues -> // TopBar에 가려지지 않도록 padding 먹여줌
-
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-
-            Text(text = "this is content")
-
-        }
-
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyTopBar(){
-
-    TopAppBar(
-        title = {
-            Text(text = "Main")
-        },
-        navigationIcon = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.Add, contentDescription = "add")
-            }
-        },
-        actions = {
-            Button(onClick = {}){
-                Text(text = "Btn")
-            }
-        },
-        colors = TopAppBarDefaults.smallTopAppBarColors(Color.Red)
+    val textList = listOf(
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
     )
 
-}
-
-@Composable
-fun MyFloatingActionButton() {
-    FloatingActionButton(onClick = { /*TODO*/ }) {
-        Icon(Icons.Default.Menu, contentDescription = "menu")
-    }
-}
-
-@Composable
-fun MyBototmBar(){
-    BottomAppBar(
-        containerColor = Color.Red
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.Home, contentDescription = "home")
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.Favorite, contentDescription = "Favorite")
-            }
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Default.Settings, contentDescription = "Settings")
-            }
+    LazyColumn{
+        items(textList){item ->
+            Text(
+                text = item,
+                fontSize = 60.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
+
 }
+
+@Composable
+fun MyLazyRow() {
+
+    val textList = listOf(
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    )
+
+    LazyRow{
+        items(textList){item ->
+            Text(
+                text = item,
+                fontSize = 100.sp,
+                modifier = Modifier.clickable {
+                    println("Clicked item : $item")
+                }
+            )
+        }
+    }
+
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyScaffoldEx()
+        MyLazyRow()
     }
 }
