@@ -1,6 +1,7 @@
 package com.inflean.composefirst
 
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -31,11 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// Row
-// Column과 반대
+// WebView
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +44,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ComposeFirstTheme {
                 Column() {
-                    CardTest("1")
-                    CardTest("2")
+                    MyWebView("https://www.naver.com")
                 }
             }
         }
@@ -52,34 +52,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CardTest(txt: String) {
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(10.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 30.dp
-        ),
-        shape = RoundedCornerShape(50.dp),
-        border = BorderStroke(1.dp, Color.Black)
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = txt,
-                fontSize = 30.sp
-            )
+fun MyWebView(url : String){
+    AndroidView(factory = {
+        WebView(it).apply{
+            loadUrl(url)
         }
-
-    }
-
+    })
 }
 
 
@@ -87,9 +65,6 @@ fun CardTest(txt: String) {
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        Column() {
-            CardTest("1")
-            CardTest("2")
-        }
+        MyWebView("https://www.naver.com")
     }
 }
