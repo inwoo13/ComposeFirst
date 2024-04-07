@@ -19,12 +19,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,81 +54,105 @@ import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.inflean.composefirst.ui.theme.ComposeFirstTheme
 
-// Surface
+// Scaffold
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MySurface2()
+                MyScaffoldEx()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MySurface1() {
+fun MyScaffoldEx(){
 
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        color = Color.Red,
-        shape = RoundedCornerShape(20.dp),
-        shadowElevation = 20.dp
-    ) {
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color.Green
-            )
-        ) {
-            Text(text = "클릭해보세요")
+    Scaffold(
+        topBar = {
+            MyTopBar()
+        },
+        floatingActionButton = {
+            MyFloatingActionButton()
+        },
+        bottomBar = {
+            MyBototmBar()
         }
-    }
+    ) {paddingValues -> // TopBar에 가려지지 않도록 padding 먹여줌
 
-}
-
-@Composable
-fun MySurface2() {
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.LightGray,
-        border = BorderStroke(2.dp, Color.Red),
-        contentColor = Color.Blue
-    ) {
-
-        Column(
+        Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(paddingValues)
         ) {
 
-            Surface(
-                modifier = Modifier.size(200.dp),
-                color = Color.Red
-            ) {
-                Text(text = "This is Jetpack Compose")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = "This is Jetpack Compose Ex"
-            )
+            Text(text = "this is content")
 
         }
 
     }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyTopBar(){
+
+    TopAppBar(
+        title = {
+            Text(text = "Main")
+        },
+        navigationIcon = {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Default.Add, contentDescription = "add")
+            }
+        },
+        actions = {
+            Button(onClick = {}){
+                Text(text = "Btn")
+            }
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(Color.Red)
+    )
+
+}
+
+@Composable
+fun MyFloatingActionButton() {
+    FloatingActionButton(onClick = { /*TODO*/ }) {
+        Icon(Icons.Default.Menu, contentDescription = "menu")
+    }
+}
+
+@Composable
+fun MyBototmBar(){
+    BottomAppBar(
+        containerColor = Color.Red
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Default.Home, contentDescription = "home")
+            }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Default.Favorite, contentDescription = "Favorite")
+            }
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings")
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MySurface2()
+        MyScaffoldEx()
     }
 }
