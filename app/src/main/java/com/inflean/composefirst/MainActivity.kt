@@ -6,6 +6,7 @@ import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -94,84 +96,55 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-// Dialog
+// Canvas
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFirstTheme {
-                MyDialog()
+                MyCanvas()
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyDialog(){
+fun MyCanvas() {
 
-    var dialogFlag by remember {
-        mutableStateOf(false)
-    }
-
-    var inputText by remember {
-        mutableStateOf("")
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .height(500.dp)
+            .background(Color.Red)
     ) {
-        Button(onClick = { dialogFlag = true }) {
-            Text(text = "나와라 Dialog")
+        Canvas(modifier = Modifier
+            .size(200.dp)
+            .align(Alignment.Center)) {
+            drawCircle(Color.Black, radius = size.minDimension / 2)
         }
-
-        if(dialogFlag) {
-            AlertDialog(
-                onDismissRequest = { },
-                title = { Text(text = "Dialog Title")},
-                text = {
-                    TextField(
-                        value = inputText,
-                        onValueChange = {inputText = it}
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { dialogFlag = false },
-                        colors = ButtonDefaults.buttonColors (
-                            containerColor = Color.Blue
-                        )
-                    ) {
-                        Text(text = "OK")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = { dialogFlag = false },
-                        colors = ButtonDefaults.buttonColors (
-                            containerColor = Color.Red
-                        )
-                    ) {
-                        Text(text = "NO")
-                    }
-                }
-
-            )
-        }
-
-        if(inputText.isNotEmpty()) {
-            Text(
-                text = "입력된 텍스트 : $inputText",
-                fontSize = 40.sp,
-                lineHeight = 40.sp
-            )
-        }
-
-
     }
+
+//    Box(
+//        modifier = Modifier
+//            .width(100.dp)
+//            .height(200.dp)
+//            .background(Color.Green)
+//    ) {
+//        Canvas(modifier = Modifier.fillMaxSize()){
+//            drawCircle(Color.Black, radius = size.minDimension / 2)
+//        }
+//    }
+
+//    Box(
+//        modifier = Modifier
+//            .size(50.dp)
+//            .background(Color.Green)
+//    ) {
+//        Canvas(modifier = Modifier.fillMaxSize()){
+//            drawCircle(Color.Black, radius = size.minDimension / 2)
+//        }
+//    }
 
 }
 
@@ -179,6 +152,6 @@ fun MyDialog(){
 @Composable
 fun GreetingPreview() {
     ComposeFirstTheme {
-        MyDialog()
+        MyCanvas()
     }
 }
